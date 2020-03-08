@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Demo of ROC vs Precision-Recall</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<script
+		src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+		crossorigin="anonymous"></script>
+</head>
+
+<body>
+<div id="form"><form>
+	<div class='form_item'>
+		<label for="label_pos_num">number of positive examples</label>
+		<input type="number" id="label_pos_num" name="label_pos_num" min="0" max="1000000" step="100" value="100" required>
+	</div><div class='form_item'>
+		<label for="label_neg_num">number of negative examples</label>
+		<input type="number" id="label_neg_num" name="label_neg_num" min="0" max="1000000" step="100" value="900" required>
+	</div><div class='form_item'>
+		<label for="prob_pos_mean">mean probability for positive examples</label>
+		<input type="number" id="prob_pos_mean" name="prob_pos_mean" min="0" max="1" step="0.05" value="0.6" required>
+	</div><div class='form_item'>
+		<label for="prob_pos_std">std probability for positive examples</label>
+		<input type="number" id="prob_pos_std" name="prob_pos_std" min="0" step="0.05" value="0.1" required>
+	</div><div class='form_item'>
+		<label for="prob_neg_mean">mean probability for negative examples</label>
+		<input type="number" id="prob_neg_mean" name="prob_neg_mean" min="0" max="1" step="0.05" value="0.4" required>
+	</div><div class='form_item'>
+		<label for="prob_neg_std">std probability for negative examples</label>
+		<input type="number" id="prob_neg_std" name="prob_neg_std" min="0" step="0.05" value="0.1" required>
+	</div><div class='form_item'>
+		<label for="threshold">threshold for positive prediction</label>
+		<input type="number" id="threshold" name="threshold" min="0" max="1" step="0.05" value="0.5" required>
+	</div><div class='form_item'>
+		<label for="seed">random seed</label>
+		<input type="number" id="seed" name="seed" min="0" value="0" required>
+	</div><div class='form_item'>
+		<label for="normalize">normalize confusion matrix</label>
+		<select name="normalize">
+			<option value="none">none</option>
+			<option value="true">true</option>
+			<option value="pred">pred</option>
+			<option value="all">all</option>
+		</select>
+	</div><div class='form_item'>
+		<input type="submit" value="Submit">
+	</div>
+</form></div>
+<div id="chart"></div>
+<div id="link"><a href="https://github.com/zenador/roc-vs-pr" target="_blank">GitHub</a></div>
+<script>
+$( document ).ready(function() {
+	$("div#form form").submit();
+});
+$("div#form form").submit(function(e) {
+	e.preventDefault();
+	$("div#chart").addClass("loading");
+	var data = $(this).serialize();
+	$.ajax({
+		url: "/chart", 
+		data: data, 
+		method: "POST",
+		dataType: 'text',
+		success: function (res) {
+			$("div#chart").html(res);
+			$("div#chart").removeClass("loading");
+		},
+		error:function(e){
+			console.log(JSON.stringify(e));
+		}
+	});
+});
+</script>
+</body>
+</html>
